@@ -11,15 +11,18 @@ import com.squareup.picasso.Picasso;
 import com.udacity.sandwichclub.model.Sandwich;
 import com.udacity.sandwichclub.utils.JsonUtils;
 
+import java.util.List;
+
 public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
 
     private ImageView ingredientsImage;
-    private TextView originName;
-    private TextView description;
-    private TextView alsoKnown;
+    private TextView placeOfOriginText;
+    private TextView descriptionText;
+    private TextView alsoKnownText;
+    private TextView ingredientsText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,21 +63,40 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void populateUI(Sandwich sandwich) {
-        originName.setText(sandwich.getPlaceOfOrigin());
-        description.setText(sandwich.getDescription());
-        for (String line : sandwich.getAlsoKnownAs()) {
-            alsoKnown.append(line + ", ");
-        }
+        placeOfOriginText.setText(checkDataIsNotEmpty(sandwich.getPlaceOfOrigin()));
+        descriptionText.setText(checkDataIsNotEmpty(sandwich.getDescription()));
+
+        renderList(alsoKnownText, sandwich.getAlsoKnownAs());
+        renderList(ingredientsText, sandwich.getIngredients());
+
         Picasso.with(this)
                 .load(sandwich.getImage())
                 .into(ingredientsImage);
+
         getSupportActionBar().setTitle(sandwich.getMainName());
+    }
+
+    private String checkDataIsNotEmpty(String data) {
+        return data.equals("") ? getString(R.string.unknown) : data;
+    }
+
+    private void renderList(TextView text, List<String> list) {
+        if (list.size() == 0) {
+            text.setText(getString(R.string.unknown));
+        }
+        for (int i = 0; i < list.size(); i++) {
+            text.append(list.get(i));
+            if (i < list.size() - 1) {
+                text.append(", ");
+            }
+        }
     }
 
     private void initViews() {
         ingredientsImage = findViewById(R.id.image_iv);
-        originName = findViewById(R.id.origin_tv);
-        description = findViewById(R.id.description_tv);
-        alsoKnown = findViewById(R.id.also_known_tv);
+        placeOfOriginText = findViewById(R.id.origin_tv);
+        descriptionText = findViewById(R.id.description_tv);
+        alsoKnownText = findViewById(R.id.also_known_tv);
+        ingredientsText = findViewById(R.id.ingredients_tv);
     }
 }
